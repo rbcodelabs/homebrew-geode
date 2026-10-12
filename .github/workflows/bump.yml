@@ -1,0 +1,27 @@
+name: Bump cask
+on:
+  schedule: [{ cron: "17 * * * *" }]
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  bump:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Update cask to latest Geode release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="$(gh release view --repo rbcodelabs/geode --json tagName --jq .tagName)"
+          latest="${tag#v}"
+          current="$(sed -nE 's/^  version "([^"]+)"/\1/p' Casks/geode.rb)"
+          [[ "$latest" != "$current" ]] || { echo "up to date ($current)"; exit 0; }
+          curl -fsSL -o g.dmg "https://github.com/rbcodelabs/geode/releases/download/$tag/Geode-$latest-arm64.dmg"
+          sha="$(shasum -a 256 g.dmg | cut -d' ' -f1)"
+          sed -i '' -E "s/^  version \".*\"/  version \"$latest\"/; s/^  sha256 \".*\"/  sha256 \"$sha\"/" Casks/geode.rb
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "geode $latest"
+          git push
