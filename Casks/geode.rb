@@ -1,8 +1,8 @@
 cask "geode" do
   arch arm: "arm64"
 
-  version "0.30.4"
-  sha256 "07589af77073e3b50813bb363241be450eaab27af2434bcde45be0eaed152272"
+  version "0.30.5"
+  sha256 "c861d83cbe78786cdbca9819605fb9eb7e4f961e58b589844c12b667298bb9a3"
 
   url "https://github.com/rbcodelabs/geode/releases/download/v#{version}/Geode-#{version}-#{arch}.dmg"
   name "Geode"
